@@ -51,10 +51,6 @@ class Program
     class BinaryTree<T> : IEnumerable<T> where T : IComparable<T>
     {
         /// <summary>
-        /// коллекция служит для реализации итератора
-        /// </summary>
-        private List<T> enumerableList;
-        /// <summary>
         /// корень дерева
         /// </summary>
         private BinaryTreeNode<T>? root;
@@ -346,33 +342,33 @@ class Program
             return true;
         }
         /// <summary>
-        /// обертка для метода извлечения значений в коллекцию
+        /// обертка для метода извлечения значений в очередь
         /// </summary>
-        private void GetValuesToList()
+        private Queue<T> GetValuesToQueue()
         {
-            enumerableList = new List<T>();
-            GetEachValuePostOrder(root, ref enumerableList);
+            Queue<T> nodesQueue = new Queue<T>();
+            GetEachValuePostOrder(root, ref nodesQueue);
+            return nodesQueue;
         }
         /// <summary>
-        /// извлечение в ходе обратного прохода дерева всех его элементов
-        /// и помещение их в коллекцию List<T>
+        /// извлечение в ходе обратного прохода дерева  
+        /// всех его узлов и помещение их в очередь
         /// </summary>
         /// <param name="node">узел</param>
-        /// <param name="values">коллекция</param>
-        private void GetEachValuePostOrder(BinaryTreeNode<T>? node, ref List<T> values)
+        /// <param name="nodesQueue">стек</param>
+        private void GetEachValuePostOrder(BinaryTreeNode<T>? node, ref Queue<T> nodesQueue)
         {
-            if (node.Left != null) { GetEachValuePostOrder(node.Left, ref values); }
-            if (node.Right != null) { GetEachValuePostOrder(node.Right, ref values); }
-            values.Add(node.Value);
+            if (node.Left != null) { GetEachValuePostOrder(node.Left, ref nodesQueue); }
+            if (node.Right != null) { GetEachValuePostOrder(node.Right, ref nodesQueue); }
+            nodesQueue.Enqueue(node.Value);
         }
         /// <summary>
         /// итератор
         /// </summary>
-        /// <returns>возвращает итератор коллекции</returns>
+        /// <returns>возвращает итератор очереди</returns>
         public IEnumerator<T> GetEnumerator()
         {
-            GetValuesToList();
-            return enumerableList.GetEnumerator();
+            return GetValuesToQueue().GetEnumerator();
         }
         /// <summary>
         /// итератор
@@ -431,10 +427,11 @@ class Program
         Console.WriteLine($"Содержит 12: {tree.Contains(12)}");   //содержит узел со значением 12 false
         Console.WriteLine($"Содержит 15: {tree.Contains(15)}");   //содержит узел со значением 15 false
 
-        tree.PostOrderTraversal();
+        Console.WriteLine("\nОбратный проход по дереву:");
+        tree.PostOrderTraversal();                                //3 7 6 5 20 17 8
 
         Console.WriteLine("Итератор:");
-        foreach (var item in tree) Console.Write($"{item} ");
+        foreach (var item in tree) Console.Write($"{item} ");     //3 7 6 5 20 17 8
 
         #region СХЕМА
         /*
