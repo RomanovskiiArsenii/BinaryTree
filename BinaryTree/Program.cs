@@ -18,7 +18,7 @@ class Program
         /// </summary>
         public BinaryTreeNode<TNode>? Left { get; set; }
         /// <summary>
-        /// ссылка на правй узел
+        /// ссылка на правый узел
         /// </summary>
         public BinaryTreeNode<TNode>? Right { get; set; }
         /// <summary>
@@ -50,6 +50,10 @@ class Program
     }
     class BinaryTree<T> : IEnumerable<T> where T : IComparable<T>
     {
+        /// <summary>
+        /// коллекция служит для реализации итератора
+        /// </summary>
+        private List<T> enumerableList;
         /// <summary>
         /// корень дерева
         /// </summary>
@@ -342,28 +346,45 @@ class Program
             return true;
         }
         /// <summary>
-        /// TODO
+        /// обертка для метода извлечения значений в коллекцию
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public IEnumerator<T> GetEnumerator()
+        private void GetValuesToList()
         {
-            throw new NotImplementedException();
+            enumerableList = new List<T>();
+            GetEachValuePostOrder(root, ref enumerableList);
         }
         /// <summary>
-        /// TODO
+        /// извлечение в ходе обратного прохода дерева всех его элементов
+        /// и помещение их в коллекцию List<T>
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <param name="node">узел</param>
+        /// <param name="values">коллекция</param>
+        private void GetEachValuePostOrder(BinaryTreeNode<T>? node, ref List<T> values)
+        {
+            if (node.Left != null) { GetEachValuePostOrder(node.Left, ref values); }
+            if (node.Right != null) { GetEachValuePostOrder(node.Right, ref values); }
+            values.Add(node.Value);
+        }
+        /// <summary>
+        /// итератор
+        /// </summary>
+        /// <returns>возвращает итератор коллекции</returns>
+        public IEnumerator<T> GetEnumerator()
+        {
+            GetValuesToList();
+            return enumerableList.GetEnumerator();
+        }
+        /// <summary>
+        /// итератор
+        /// </summary>
+        /// <returns>GetEnumerator()</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
         }
     }
-
     static void Main(string[] args)
     {
-
         BinaryTree<int> tree = new BinaryTree<int>();
 
         //добавление элементов
@@ -380,12 +401,16 @@ class Program
         tree.Add(17);
 
         //вспомогательные методы
-        Console.WriteLine($"\nКоличество узлов: {tree.Count}");   //10 количество узлов
+        Console.WriteLine($"\nКоличество узлов: {tree.Count}");   //количество узлов
         Console.WriteLine($"Содержит 10: {tree.Contains(10)}");   //содержит узел со значением 10 true 
         Console.WriteLine($"Содержит 12: {tree.Contains(12)}");   //содержит узел со значением 12 true 
         Console.WriteLine($"Содержит 15: {tree.Contains(15)}");   //содержит узел со значением 15 true
 
         //проход по дереву
+        Console.WriteLine("\nСимметричный проход по дереву:");
+        tree.InOrderTraversal();
+        Console.WriteLine("\nОбратный проход по дереву:");
+        tree.PostOrderTraversal();
         Console.WriteLine("\nПрямой проход по дереву:");
         tree.PreOrderTraversal();                                 //прямой проход узлов
 
@@ -401,10 +426,15 @@ class Program
         tree.PreOrderTraversal();                                                 //у которого есть левый потомок
 
         //вспомогательные методы
-        Console.WriteLine($"\nКоличество узлов: {tree.Count}");   //7 количество узлов
+        Console.WriteLine($"\nКоличество узлов: {tree.Count}");   //количество узлов
         Console.WriteLine($"Содержит 10: {tree.Contains(10)}");   //содержит узел со значением 10 false
         Console.WriteLine($"Содержит 12: {tree.Contains(12)}");   //содержит узел со значением 12 false
         Console.WriteLine($"Содержит 15: {tree.Contains(15)}");   //содержит узел со значением 15 false
+
+        tree.PostOrderTraversal();
+
+        Console.WriteLine("Итератор:");
+        foreach (var item in tree) Console.Write($"{item} ");
 
         #region СХЕМА
         /*
